@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Master</title>
+<link rel="stylesheet" href="style.css">
+
+<meta name="google-site-varification"
+content="<meta name="google-site-verification" content="wY2XAPTSRYdXhlQk_bET9eybCqC7cNd2dqGnHtiO6lw" />
+</head>
+
+
+<body>
+
+<header>
+    <div class="logo">🧮</div>
+    <div>
+        <h1>Math Master</h1>
+        <p>Learn • Practice • Improve</p>
+    </div>
+
+    <div class="topButtons">
+        <button onclick="toggleSound()" id="soundBtn">🔊</button>
+        <button onclick="toggleDark()">🌙</button>
+    </div>
+</header>
+
+<main>
+
+<section class="profile">
+    <div class="avatar">M</div>
+    <div>
+        <h2>Welcome to Math Master 👋</h2>
+        <p>Practice Maths and become a Maths Master!</p>
+    </div>
+</section>
+
+<section class="stats">
+
+    <div>
+        🏆
+        <b id="bestScore">0</b>
+        <small>Best Score</small>
+    </div>
+
+    <div>
+        📊
+        <b id="accuracy">0%</b>
+        <small>Accuracy</small>
+    </div>
+
+    <div>
+        🔥
+        <b id="streak">0</b>
+        <small>Streak</small>
+    </div>
+
+</section>
+
+
+<section class="settings">
+
+<h2>🎯 Start Practice</h2>
+
+<label>📚 Select Class</label>
+
+<select id="classSelect" onchange="loadChapters()">
+<option value="1">Class 1</option>
+<option value="2">Class 2</option>
+<option value="3">Class 3</option>
+<option value="4">Class 4</option>
+<option value="5">Class 5</option>
+<option value="6">Class 6</option>
+<option value="7">Class 7</option>
+<option value="8">Class 8</option>
+<option value="9">Class 9</option>
+<option value="10">Class 10</option>
+<option value="11">Class 11</option>
+<option value="12">Class 12</option>
+</select>
+
+
+<label>📖 Chapter</label>
+
+<select id="chapter"></select>
+
+
+<label>📝 Question Type</label>
+
+<select id="type">
+
+<option value="mcq">🟦 MCQ</option>
+<option value="veryshort">🟢 Very Short</option>
+<option value="short">🟡 Short</option>
+<option value="long">🔴 Long</option>
+<option value="hots">🔥 Hard / HOTS</option>
+
+</select>
+
+
+<label>⚡ Difficulty</label>
+
+<select id="difficulty">
+
+<option value="easy">Easy</option>
+<option value="medium">Medium</option>
+<option value="hard">Hard</option>
+
+</select>
+
+
+<label>⏱️ Time</label>
+
+<select id="time">
+<option value="60">60 Seconds</option>
+<option value="120">2 Minutes</option>
+<option value="180">3 Minutes</option>
+<option value="300">5 Minutes</option>
+</select>
+
+
+<button class="start" onclick="startQuiz()">
+🚀 Start Practice
+</button>
+
+</section>
+
+
+<section class="quiz" id="quiz">
+
+<div class="quizHeader">
+<span id="qNo">Question 0/10</span>
+<span>⏱️ <b id="timer">60</b></span>
+</div>
+
+<div class="progress">
+<div id="progress"></div>
+</div>
+
+<h2 id="question">
+Choose your class and start practice 🚀
+</h2>
+
+<div id="options"></div>
+
+<input
+type="text"
+id="answer"
+placeholder="Enter your answer"
+>
+
+<textarea
+id="longAnswer"
+placeholder="Write your answer / solution here..."
+></textarea>
+
+<div class="buttons">
+
+<button id="check" onclick="checkAnswer()">
+✅ Check Answer
+</button>
+
+<button id="next" onclick="nextQuestion()" disabled>
+Next ➜
+</button>
+
+</div>
+
+<div id="result"></div>
+
+<div id="explanation"></div>
+
+</section>
+
+
+<section class="resultCard" id="resultCard">
+
+<h1>🎉 Quiz Complete!</h1>
+
+<div class="bigScore">
+<span id="finalScore">0</span>/10
+</div>
+
+<div class="results">
+
+<div>
+<b id="correct">0</b>
+Correct
+</div>
+
+<div>
+<b id="wrong">0</b>
+Wrong
+</div>
+
+<div>
+<b id="finalAccuracy">0%</b>
+Accuracy
+</div>
+
+</div>
+
+<button onclick="startQuiz()">🔄 Retry</button>
+<button onclick="location.reload()">🏠 Home</button>
+
+</section>
+
+</main>
+
+
+<footer>
+🧮 Math Master<br>
+<small>Learn • Practice • Improve</small>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
+<h1>Maths Practice</h1>
+<p>Created by Riyanshu Kumar<p>
