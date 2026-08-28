@@ -1,113 +1,150 @@
 /*
 =========================================================
-🧮 MATH MASTER — VERSION 5
-500 QUESTION SYSTEM + SPECIAL FEATURES
+🧮 MATH MASTER — JAVASCRIPT VERSION 8
+=========================================================
+FEATURES
+❤️ Lives
+🔥 Streak
+💡 Hint
+⏭️ Skip
+🏆 Best Score
+📜 History
+🔊 Sound
+🌙 Dark Mode
+🔥 Daily Challenge
+⭐ XP + Level
+🏅 Achievements
+⚡ Combo Bonus
+🎉 Perfect Score
+💾 Local Storage
 =========================================================
 */
 
 "use strict";
 
+/* =====================================================
+   SETTINGS
+===================================================== */
+
 const TOTAL_QUESTIONS = 10;
 
-/* =========================================================
-   VARIABLES
-========================================================= */
+const MAX_LIVES = 3;
+const START_HINTS = 2;
 
 let score = 0;
 let correct = 0;
 let wrong = 0;
+let skipped = 0;
+
 let qNumber = 0;
+
+let streak = 0;
+let combo = 0;
+
+let bestStreak =
+    Number(localStorage.getItem("bestStreak") || 0);
+
+let lives = MAX_LIVES;
+let hintsLeft = START_HINTS;
 
 let timeLeft = 60;
 let timer = null;
 
 let answered = false;
 let soundOn = true;
+let dailyMode = false;
 
 let currentQuestion = null;
 let quizQuestions = [];
 
-let streak = 0;
-let bestStreak =
-    Number(localStorage.getItem("bestStreak") || 0);
 
-let lives = 3;
-let hintsLeft = 2;
-let skipped = 0;
+/* =====================================================
+   PLAYER DATA
+===================================================== */
 
-let dailyMode = false;
+let playerXP =
+    Number(localStorage.getItem("playerXP") || 0);
+
+let playerLevel =
+    Number(localStorage.getItem("playerLevel") || 1);
+
+let dailyStreak =
+    Number(localStorage.getItem("dailyStreak") || 0);
+
+let lastDailyDate =
+    localStorage.getItem("lastDailyDate") || "";
 
 
-/* =========================================================
+/* =====================================================
    CHAPTERS
-========================================================= */
+===================================================== */
 
 const chapters = {
 
-    1: [
+    1:[
         "Numbers",
         "Addition",
         "Subtraction",
         "Shapes"
     ],
 
-    2: [
+    2:[
         "Numbers",
         "Addition",
         "Subtraction",
         "Multiplication"
     ],
 
-    3: [
+    3:[
         "Numbers",
         "Multiplication",
         "Division",
         "Fractions"
     ],
 
-    4: [
+    4:[
         "Numbers",
         "Fractions",
         "Decimals",
         "Geometry"
     ],
 
-    5: [
+    5:[
         "Numbers",
         "Fractions",
         "Decimals",
         "Geometry"
     ],
 
-    6: [
+    6:[
         "Knowing Our Numbers",
         "Integers",
         "Fractions",
         "Decimals"
     ],
 
-    7: [
+    7:[
         "Integers",
         "Fractions and Decimals",
         "Simple Equations",
         "Lines and Angles"
     ],
 
-    8: [
+    8:[
         "Rational Numbers",
         "Linear Equations",
         "Squares and Square Roots",
         "Mensuration"
     ],
 
-    9: [
+    9:[
         "Number Systems",
         "Polynomials",
         "Coordinate Geometry",
         "Statistics"
     ],
 
-    10: [
+    10:[
         "Real Numbers",
         "Polynomials",
         "Quadratic Equations",
@@ -115,14 +152,14 @@ const chapters = {
         "Trigonometry"
     ],
 
-    11: [
+    11:[
         "Sets",
         "Trigonometry",
         "Sequences and Series",
         "Probability"
     ],
 
-    12: [
+    12:[
         "Relations and Functions",
         "Matrices",
         "Calculus",
@@ -132,808 +169,270 @@ const chapters = {
 };
 
 
-/* =========================================================
-   500 QUESTIONS
-   यहाँ अपने 500 questions रखें
-========================================================= */
+/*
+=========================================================
+QUESTIONS
+=========================================================
+
+⚠️ अपने existing questions array को यहाँ रखें।
+
+Example:
+
+const questions = [
+    {
+        class:1,
+        chapter:"Numbers",
+        type:"mcq",
+        difficulty:"easy",
+        question:"What number comes after 49?",
+        options:["48","50","51","59"],
+        answer:"50",
+        explanation:"49 के बाद 50 आता है।",
+        hint:"एक number आगे गिनो।"
+    }
+];
+
+=========================================================
+*/
 
 const questions = [
 
-/* ================= CLASS 1 ================= */
+    {
+        class:1,
+        chapter:"Numbers",
+        type:"mcq",
+        difficulty:"easy",
+        question:"What number comes after 49?",
+        options:[
+            "48",
+            "50",
+            "51",
+            "59"
+        ],
+        answer:"50",
+        explanation:"49 के बाद 50 आता है।",
+        hint:"एक number आगे गिनो।"
+    },
 
-{
-class:1,
-chapter:"Numbers",
-type:"mcq",
-difficulty:"easy",
-question:"What number comes after 49?",
-options:["48","50","51","59"],
-answer:"50",
-explanation:"Counting after 49 gives 50.",
-hint:"Count one number forward."
-},
+    {
+        class:1,
+        chapter:"Addition",
+        type:"veryshort",
+        difficulty:"easy",
+        question:"What is 7 + 6?",
+        answer:"13",
+        explanation:"7 + 6 = 13.",
+        hint:"7 में 6 जोड़ो।"
+    },
 
-{
-class:1,
-chapter:"Addition",
-type:"veryshort",
-difficulty:"easy",
-question:"What is 7 + 6?",
-answer:"13",
-explanation:"7 + 6 = 13.",
-hint:"Add 7 and 6."
-},
+    {
+        class:2,
+        chapter:"Multiplication",
+        type:"mcq",
+        difficulty:"medium",
+        question:"What is 6 × 7?",
+        options:[
+            "36",
+            "42",
+            "48",
+            "49"
+        ],
+        answer:"42",
+        explanation:"6 × 7 = 42.",
+        hint:"7 का table याद करो।"
+    },
 
-{
-class:1,
-chapter:"Subtraction",
-type:"short",
-difficulty:"easy",
-question:"What is 15 - 6?",
-answer:"9",
-explanation:"15 - 6 = 9.",
-hint:"Take 6 away from 15."
-},
+    {
+        class:3,
+        chapter:"Division",
+        type:"mcq",
+        difficulty:"medium",
+        question:"48 sweets are divided among 6 children. Each gets:",
+        options:[
+            "6",
+            "7",
+            "8",
+            "9"
+        ],
+        answer:"8",
+        explanation:"48 ÷ 6 = 8.",
+        hint:"6 × ? = 48."
+    },
 
-{
-class:1,
-chapter:"Shapes",
-type:"mcq",
-difficulty:"easy",
-question:"Which shape has 4 equal sides?",
-options:[
-"Triangle",
-"Circle",
-"Square",
-"Oval"
-],
-answer:"Square",
-explanation:"A square has four equal sides.",
-hint:"Think of a box-like shape."
-},
+    {
+        class:4,
+        chapter:"Geometry",
+        type:"mcq",
+        difficulty:"easy",
+        question:"How many right angles does a rectangle have?",
+        options:[
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+        answer:"4",
+        explanation:"Rectangle में चार right angles होते हैं।",
+        hint:"चारों corners देखो।"
+    },
 
-{
-class:1,
-chapter:"Numbers",
-type:"mcq",
-difficulty:"easy",
-question:"Which number is greatest?",
-options:[
-"18",
-"81",
-"28",
-"38"
-],
-answer:"81",
-explanation:"81 is the greatest number.",
-hint:"Compare the tens digits."
-},
+    {
+        class:5,
+        chapter:"Decimals",
+        type:"short",
+        difficulty:"hard",
+        question:"Find 4.75 + 2.25.",
+        answer:"7",
+        explanation:"4.75 + 2.25 = 7.",
+        hint:"Decimal parts को जोड़ो।"
+    },
 
-/* ================= CLASS 2 ================= */
+    {
+        class:6,
+        chapter:"Integers",
+        type:"mcq",
+        difficulty:"hard",
+        question:"What is (-12) + 7 - (-5)?",
+        options:[
+            "0",
+            "-10",
+            "10",
+            "5"
+        ],
+        answer:"0",
+        explanation:"-12 + 7 + 5 = 0.",
+        hint:"Negative number को subtract करने पर addition होता है।"
+    },
 
-{
-class:2,
-chapter:"Addition",
-type:"short",
-difficulty:"medium",
-question:"Find 36 + 27.",
-answer:"63",
-explanation:"36 + 27 = 63.",
-hint:"Add ones first."
-},
+    {
+        class:7,
+        chapter:"Simple Equations",
+        type:"mcq",
+        difficulty:"hard",
+        question:"If 3x + 5 = 20, find x.",
+        options:[
+            "3",
+            "5",
+            "7",
+            "8"
+        ],
+        answer:"5",
+        explanation:"3x = 15, इसलिए x = 5.",
+        hint:"पहले 5 subtract करो।"
+    },
 
-{
-class:2,
-chapter:"Subtraction",
-type:"veryshort",
-difficulty:"easy",
-question:"Find 70 - 25.",
-answer:"45",
-explanation:"70 - 25 = 45.",
-hint:"Subtract 20, then 5."
-},
+    {
+        class:8,
+        chapter:"Squares and Square Roots",
+        type:"mcq",
+        difficulty:"hard",
+        question:"Which number has square root 12?",
+        options:[
+            "121",
+            "132",
+            "144",
+            "156"
+        ],
+        answer:"144",
+        explanation:"12 × 12 = 144.",
+        hint:"12 का square निकालो।"
+    },
 
-{
-class:2,
-chapter:"Multiplication",
-type:"mcq",
-difficulty:"medium",
-question:"What is 6 × 7?",
-options:[
-"36",
-"42",
-"48",
-"49"
-],
-answer:"42",
-explanation:"6 × 7 = 42.",
-hint:"Recall the 7 times table."
-},
+    {
+        class:9,
+        chapter:"Coordinate Geometry",
+        type:"mcq",
+        difficulty:"hard",
+        question:"Distance between (0,0) and (3,4) is:",
+        options:[
+            "3",
+            "4",
+            "5",
+            "7"
+        ],
+        answer:"5",
+        explanation:"√(3² + 4²) = √25 = 5.",
+        hint:"Distance formula use करो।"
+    },
 
-{
-class:2,
-chapter:"Numbers",
-type:"veryshort",
-difficulty:"easy",
-question:"What is the place value of 5 in 52?",
-answer:"50",
-explanation:"5 is in the tens place.",
-hint:"5 is in the tens position."
-},
+    {
+        class:10,
+        chapter:"Trigonometry",
+        type:"mcq",
+        difficulty:"hard",
+        question:"If tan θ = 1 and θ is acute, then θ is:",
+        options:[
+            "30°",
+            "45°",
+            "60°",
+            "90°"
+        ],
+        answer:"45°",
+        explanation:"tan 45° = 1.",
+        hint:"Standard trigonometric values याद करो।"
+    },
 
-{
-class:2,
-chapter:"Multiplication",
-type:"short",
-difficulty:"medium",
-question:"There are 4 boxes with 9 pencils in each. How many pencils?",
-answer:"36",
-explanation:"4 × 9 = 36.",
-hint:"Multiply number of boxes by pencils."
-},
+    {
+        class:11,
+        chapter:"Probability",
+        type:"veryshort",
+        difficulty:"medium",
+        question:"Probability of getting a head on a fair coin is:",
+        answer:"1/2",
+        explanation:"दो equally likely outcomes हैं।",
+        hint:"एक favourable outcome और दो total outcomes।"
+    },
 
-/* ================= CLASS 3 ================= */
-
-{
-class:3,
-chapter:"Numbers",
-type:"mcq",
-difficulty:"medium",
-question:"What is the place value of 7 in 472?",
-options:[
-"7",
-"70",
-"700",
-"72"
-],
-answer:"70",
-explanation:"7 is in the tens place.",
-hint:"Look at the position of 7."
-},
-
-{
-class:3,
-chapter:"Multiplication",
-type:"short",
-difficulty:"hard",
-question:"There are 24 boxes with 6 pencils in each. Find total pencils.",
-answer:"144",
-explanation:"24 × 6 = 144.",
-hint:"Multiply 24 by 6."
-},
-
-{
-class:3,
-chapter:"Division",
-type:"mcq",
-difficulty:"medium",
-question:"48 sweets are divided among 6 children. Each gets:",
-options:[
-"6",
-"7",
-"8",
-"9"
-],
-answer:"8",
-explanation:"48 ÷ 6 = 8.",
-hint:"6 × ? = 48."
-},
-
-{
-class:3,
-chapter:"Fractions",
-type:"veryshort",
-difficulty:"easy",
-question:"What is half of 20?",
-answer:"10",
-explanation:"20 ÷ 2 = 10.",
-hint:"Divide 20 by 2."
-},
-
-{
-class:3,
-chapter:"Division",
-type:"veryshort",
-difficulty:"medium",
-question:"What is 81 ÷ 9?",
-answer:"9",
-explanation:"81 ÷ 9 = 9.",
-hint:"9 × 9 = ?"
-},
-
-/* ================= CLASS 4 ================= */
-
-{
-class:4,
-chapter:"Fractions",
-type:"mcq",
-difficulty:"hard",
-question:"Which fraction is greatest?",
-options:[
-"1/4",
-"1/2",
-"1/8",
-"1/10"
-],
-answer:"1/2",
-explanation:"1/2 is greatest.",
-hint:"Compare the size of the fractions."
-},
-
-{
-class:4,
-chapter:"Decimals",
-type:"veryshort",
-difficulty:"medium",
-question:"Find 2.5 + 1.5.",
-answer:"4",
-explanation:"2.5 + 1.5 = 4.",
-hint:"Add the decimal numbers."
-},
-
-{
-class:4,
-chapter:"Geometry",
-type:"short",
-difficulty:"medium",
-question:"A rectangle is 8 cm long and 5 cm wide. Find its perimeter.",
-answer:"26",
-explanation:"2 × (8 + 5) = 26 cm.",
-hint:"Perimeter = 2(length + breadth)."
-},
-
-{
-class:4,
-chapter:"Geometry",
-type:"mcq",
-difficulty:"easy",
-question:"How many right angles does a rectangle have?",
-options:[
-"2",
-"3",
-"4",
-"5"
-],
-answer:"4",
-explanation:"A rectangle has four right angles.",
-hint:"Look at all four corners."
-},
-
-/* ================= CLASS 5 ================= */
-
-{
-class:5,
-chapter:"Fractions",
-type:"mcq",
-difficulty:"hard",
-question:"Which decimal is equal to 3/4?",
-options:[
-"0.25",
-"0.50",
-"0.75",
-"1.25"
-],
-answer:"0.75",
-explanation:"3 ÷ 4 = 0.75.",
-hint:"Divide 3 by 4."
-},
-
-{
-class:5,
-chapter:"Decimals",
-type:"short",
-difficulty:"hard",
-question:"Find 4.75 + 2.25.",
-answer:"7",
-explanation:"4.75 + 2.25 = 7.",
-hint:"Add the decimal parts."
-},
-
-{
-class:5,
-chapter:"Geometry",
-type:"hots",
-difficulty:"hard",
-question:"A square has side 9 cm. Find its perimeter.",
-answer:"36",
-explanation:"4 × 9 = 36 cm.",
-hint:"A square has four equal sides."
-},
-
-{
-class:5,
-chapter:"Numbers",
-type:"mcq",
-difficulty:"medium",
-question:"What is the smallest 5-digit number?",
-options:[
-"9999",
-"10000",
-"10001",
-"99999"
-],
-answer:"10000",
-explanation:"10000 is the smallest 5-digit number.",
-hint:"The first 5-digit number."
-},
-
-/* ================= CLASS 6 ================= */
-
-{
-class:6,
-chapter:"Integers",
-type:"mcq",
-difficulty:"hard",
-question:"What is (-12) + 7 - (-5)?",
-options:[
-"0",
-"-10",
-"10",
-"5"
-],
-answer:"0",
-explanation:"-12 + 7 + 5 = 0.",
-hint:"Subtracting a negative becomes addition."
-},
-
-{
-class:6,
-chapter:"Fractions",
-type:"short",
-difficulty:"hard",
-question:"Find 3/4 + 5/8.",
-answer:"11/8",
-explanation:"3/4 = 6/8, so 6/8 + 5/8 = 11/8.",
-hint:"Convert both fractions to denominator 8."
-},
-
-{
-class:6,
-chapter:"Decimals",
-type:"mcq",
-difficulty:"medium",
-question:"Which is greatest?",
-options:[
-"0.45",
-"0.5",
-"0.405",
-"0.04"
-],
-answer:"0.5",
-explanation:"0.5 is greatest.",
-hint:"Write 0.5 as 0.50."
-},
-
-{
-class:6,
-chapter:"Integers",
-type:"short",
-difficulty:"medium",
-question:"Find (-8) + 15.",
-answer:"7",
-explanation:"15 - 8 = 7.",
-hint:"Move 8 places left from 15."
-},
-
-/* ================= CLASS 7 ================= */
-
-{
-class:7,
-chapter:"Simple Equations",
-type:"mcq",
-difficulty:"hard",
-question:"If 3x + 5 = 20, find x.",
-options:[
-"3",
-"5",
-"7",
-"8"
-],
-answer:"5",
-explanation:"3x = 15, therefore x = 5.",
-hint:"Subtract 5 first."
-},
-
-{
-class:7,
-chapter:"Integers",
-type:"hots",
-difficulty:"hard",
-question:"Find (-8) × (-6).",
-answer:"48",
-explanation:"Negative × negative = positive.",
-hint:"Two negative signs make a positive."
-},
-
-{
-class:7,
-chapter:"Lines and Angles",
-type:"mcq",
-difficulty:"medium",
-question:"Angles on a straight line add up to:",
-options:[
-"90°",
-"180°",
-"270°",
-"360°"
-],
-answer:"180°",
-explanation:"A straight angle measures 180°.",
-hint:"Think of a straight line."
-},
-
-{
-class:7,
-chapter:"Simple Equations",
-type:"short",
-difficulty:"hard",
-question:"Solve 2x + 7 = 19.",
-answer:"6",
-explanation:"2x = 12, so x = 6.",
-hint:"Subtract 7, then divide by 2."
-},
-
-/* ================= CLASS 8 ================= */
-
-{
-class:8,
-chapter:"Linear Equations",
-type:"mcq",
-difficulty:"hard",
-question:"If 5x - 7 = 3x + 9, find x.",
-options:[
-"6",
-"7",
-"8",
-"9"
-],
-answer:"8",
-explanation:"2x = 16, so x = 8.",
-hint:"Bring x terms to one side."
-},
-
-{
-class:8,
-chapter:"Squares and Square Roots",
-type:"mcq",
-difficulty:"hard",
-question:"Which number has square root 12?",
-options:[
-"121",
-"132",
-"144",
-"156"
-],
-answer:"144",
-explanation:"12 × 12 = 144.",
-hint:"Find 12 squared."
-},
-
-{
-class:8,
-chapter:"Mensuration",
-type:"mcq",
-difficulty:"medium",
-question:"Area of a rectangle with length 10 cm and breadth 6 cm is:",
-options:[
-"16",
-"32",
-"60",
-"100"
-],
-answer:"60",
-explanation:"10 × 6 = 60 cm².",
-hint:"Area = length × breadth."
-},
-
-/* ================= CLASS 9 ================= */
-
-{
-class:9,
-chapter:"Coordinate Geometry",
-type:"mcq",
-difficulty:"hard",
-question:"Distance between (0,0) and (3,4) is:",
-options:[
-"3",
-"4",
-"5",
-"7"
-],
-answer:"5",
-explanation:"√(3² + 4²) = √25 = 5.",
-hint:"Use the distance formula."
-},
-
-{
-class:9,
-chapter:"Statistics",
-type:"veryshort",
-difficulty:"medium",
-question:"Find the mean of 2, 4 and 6.",
-answer:"4",
-explanation:"(2 + 4 + 6) ÷ 3 = 4.",
-hint:"Add all values and divide by 3."
-},
-
-{
-class:9,
-chapter:"Number Systems",
-type:"mcq",
-difficulty:"medium",
-question:"Which is irrational?",
-options:[
-"1/2",
-"0.25",
-"√2",
-"3"
-],
-answer:"√2",
-explanation:"√2 cannot be expressed as p/q.",
-hint:"Think about non-terminating non-repeating numbers."
-},
-
-{
-class:9,
-chapter:"Polynomials",
-type:"mcq",
-difficulty:"hard",
-question:"If p(x)=x+5, find p(3).",
-options:[
-"5",
-"7",
-"8",
-"9"
-],
-answer:"8",
-explanation:"3 + 5 = 8.",
-hint:"Put x = 3."
-},
-
-/* ================= CLASS 10 ================= */
-
-{
-class:10,
-chapter:"Quadratic Equations",
-type:"mcq",
-difficulty:"hard",
-question:"If x + 1/x = 5, find x² + 1/x².",
-options:[
-"21",
-"23",
-"25",
-"27"
-],
-answer:"23",
-explanation:"25 = x² + 1/x² + 2, so answer = 23.",
-hint:"Square both sides."
-},
-
-{
-class:10,
-chapter:"Trigonometry",
-type:"mcq",
-difficulty:"hard",
-question:"If tan θ = 1 and θ is acute, then θ is:",
-options:[
-"30°",
-"45°",
-"60°",
-"90°"
-],
-answer:"45°",
-explanation:"tan 45° = 1.",
-hint:"Recall standard trigonometric values."
-},
-
-{
-class:10,
-chapter:"Real Numbers",
-type:"veryshort",
-difficulty:"medium",
-question:"Find HCF of 12 and 18.",
-answer:"6",
-explanation:"HCF is 6.",
-hint:"Find the greatest common factor."
-},
-
-{
-class:10,
-chapter:"Polynomials",
-type:"mcq",
-difficulty:"medium",
-question:"If zeroes of x² - 5x + 6 are:",
-options:[
-"1,6",
-"2,3",
-"-2,-3",
-"3,4"
-],
-answer:"2,3",
-explanation:"x² - 5x + 6 = (x-2)(x-3).",
-hint:"Find two numbers whose product is 6 and sum is 5."
-},
-
-{
-class:10,
-chapter:"Quadratic Equations",
-type:"short",
-difficulty:"hard",
-question:"Solve x² - 5x + 6 = 0.",
-answer:"2,3",
-explanation:"(x-2)(x-3)=0, so x=2 or 3.",
-hint:"Factorise the quadratic."
-},
-
-{
-class:10,
-chapter:"Trigonometry",
-type:"veryshort",
-difficulty:"medium",
-question:"Find sin 30°.",
-answer:"1/2",
-explanation:"sin 30° = 1/2.",
-hint:"Recall the standard value."
-},
-
-/* ================= CLASS 11 ================= */
-
-{
-class:11,
-chapter:"Sequences and Series",
-type:"mcq",
-difficulty:"hard",
-question:"The 10th term of AP 3,7,11,... is:",
-options:[
-"35",
-"39",
-"43",
-"47"
-],
-answer:"39",
-explanation:"a=3,d=4. a10=3+9×4=39.",
-hint:"Use aₙ = a + (n-1)d."
-},
-
-{
-class:11,
-chapter:"Probability",
-type:"veryshort",
-difficulty:"medium",
-question:"Probability of getting a head on a fair coin is:",
-answer:"1/2",
-explanation:"One favourable outcome out of two.",
-hint:"There are two equally likely outcomes."
-},
-
-{
-class:11,
-chapter:"Sets",
-type:"mcq",
-difficulty:"medium",
-question:"If A={1,2,3}, how many elements does A have?",
-options:[
-"1",
-"2",
-"3",
-"4"
-],
-answer:"3",
-explanation:"A contains 3 elements.",
-hint:"Count the elements."
-},
-
-/* ================= CLASS 12 ================= */
-
-{
-class:12,
-chapter:"Matrices",
-type:"mcq",
-difficulty:"hard",
-question:"A 2×3 matrix contains how many elements?",
-options:[
-"5",
-"6",
-"8",
-"9"
-],
-answer:"6",
-explanation:"2 × 3 = 6.",
-hint:"Rows × columns."
-},
-
-{
-class:12,
-chapter:"Calculus",
-type:"veryshort",
-difficulty:"medium",
-question:"Find derivative of x².",
-answer:"2x",
-explanation:"d(x²)/dx = 2x.",
-hint:"Use the power rule."
-},
-
-{
-class:12,
-chapter:"Relations and Functions",
-type:"mcq",
-difficulty:"hard",
-question:"If f(x)=2x+3, find f(4).",
-options:[
-"8",
-"9",
-"11",
-"12"
-],
-answer:"11",
-explanation:"2(4)+3=11.",
-hint:"Put x = 4."
-}
+    {
+        class:12,
+        chapter:"Calculus",
+        type:"veryshort",
+        difficulty:"medium",
+        question:"Find derivative of x².",
+        answer:"2x",
+        explanation:"d(x²)/dx = 2x.",
+        hint:"Power rule याद करो।"
+    }
 
 ];
 
 
-/*
-=========================================================
-⚠️ IMPORTANT
-ऊपर example questions हैं।
-आपके 500-question version में इसी format में
-बाकी questions भी add किए जा सकते हैं।
-=========================================================
-*/
+/* =====================================================
+   UTILITY
+===================================================== */
 
+function getElement(id){
 
-/* =========================================================
-   CHAPTER DROPDOWN
-========================================================= */
-
-function loadChapters(){
-
-    const classSelect =
-        document.getElementById("classSelect");
-
-    const chapterSelect =
-        document.getElementById("chapter");
-
-    if(!classSelect || !chapterSelect)
-        return;
-
-    const cls =
-        Number(classSelect.value);
-
-    chapterSelect.innerHTML = "";
-
-    (chapters[cls] || []).forEach(chapterName => {
-
-        const option =
-            document.createElement("option");
-
-        option.value =
-            chapterName;
-
-        option.textContent =
-            chapterName;
-
-        chapterSelect.appendChild(option);
-
-    });
+    return document.getElementById(id);
 
 }
 
 
-/* =========================================================
+/* =====================================================
    SHUFFLE
-========================================================= */
+===================================================== */
 
 function shuffleArray(array){
 
-    for(let i = array.length - 1; i > 0; i--){
+    for(
+        let i = array.length - 1;
+        i > 0;
+        i--
+    ){
 
         const j =
-            Math.floor(Math.random() * (i + 1));
+            Math.floor(
+                Math.random() * (i + 1)
+            );
 
-        [array[i], array[j]] =
-        [array[j], array[i]];
+        [
+            array[i],
+            array[j]
+        ] =
+        [
+            array[j],
+            array[i]
+        ];
 
     }
 
@@ -942,25 +441,67 @@ function shuffleArray(array){
 }
 
 
-/* =========================================================
+/* =====================================================
+   CHAPTER LOADER
+===================================================== */
+
+function loadChapters(){
+
+    const classSelect =
+        getElement("classSelect");
+
+    const chapterSelect =
+        getElement("chapter");
+
+    if(
+        !classSelect ||
+        !chapterSelect
+    )
+        return;
+
+
+    const cls =
+        Number(classSelect.value);
+
+
+    chapterSelect.innerHTML = "";
+
+
+    (chapters[cls] || [])
+        .forEach(name => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = name;
+            option.textContent = name;
+
+            chapterSelect.appendChild(option);
+
+        });
+
+}
+
+
+/* =====================================================
    GET QUESTIONS
-========================================================= */
+===================================================== */
 
 function getQuestions(){
 
     const cls =
         Number(
-            document.getElementById("classSelect").value
+            getElement("classSelect").value
         );
 
     const chapter =
-        document.getElementById("chapter").value;
+        getElement("chapter").value;
 
     const type =
-        document.getElementById("type").value;
+        getElement("type").value;
 
     const difficulty =
-        document.getElementById("difficulty").value;
+        getElement("difficulty").value;
 
 
     let list =
@@ -1011,35 +552,24 @@ function getQuestions(){
     }
 
 
-    return shuffleArray([...list]);
+    return shuffleArray([
+        ...list
+    ]);
 
 }
 
 
-/* =========================================================
+/* =====================================================
    START QUIZ
-========================================================= */
+===================================================== */
 
 function startQuiz(){
 
     clearInterval(timer);
 
-    score = 0;
-    correct = 0;
-    wrong = 0;
-    qNumber = 0;
+    dailyMode = false;
 
-    answered = false;
-
-    streak = 0;
-    lives = 3;
-    hintsLeft = 2;
-    skipped = 0;
-
-    timeLeft =
-        Number(
-            document.getElementById("time").value
-        );
+    resetQuizData();
 
 
     quizQuestions =
@@ -1053,10 +583,12 @@ function startQuiz(){
         );
 
 
-    if(quizQuestions.length === 0){
+    if(
+        quizQuestions.length === 0
+    ){
 
         alert(
-            "इस selection के लिए question नहीं मिला।"
+            "इस selection के लिए questions नहीं मिले।"
         );
 
         return;
@@ -1064,23 +596,90 @@ function startQuiz(){
     }
 
 
-    document.getElementById("quiz")
-        .style.display = "block";
+    showQuiz();
 
 
-    document.getElementById("resultCard")
-        .style.display = "none";
+    nextQuestion();
 
 
-    document.getElementById("timer")
-        .innerText = timeLeft;
+    startTimer();
+
+}
+
+
+/* =====================================================
+   RESET QUIZ DATA
+===================================================== */
+
+function resetQuizData(){
+
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    skipped = 0;
+
+    qNumber = 0;
+
+    streak = 0;
+    combo = 0;
+
+    lives = MAX_LIVES;
+    hintsLeft = START_HINTS;
+
+    answered = false;
+
+
+    timeLeft =
+        Number(
+            getElement("time")?.value || 60
+        );
+
+}
+
+
+/* =====================================================
+   SHOW QUIZ
+===================================================== */
+
+function showQuiz(){
+
+    const quiz =
+        getElement("quiz");
+
+    const resultCard =
+        getElement("resultCard");
+
+
+    if(quiz)
+        quiz.style.display = "block";
+
+
+    if(resultCard)
+        resultCard.style.display = "none";
+
+
+    const timerElement =
+        getElement("timer");
+
+    if(timerElement)
+        timerElement.innerText =
+            timeLeft;
 
 
     updateFeatureDisplay();
 
     updateAccuracy();
 
-    nextQuestion();
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function startTimer(){
+
+    clearInterval(timer);
 
 
     timer =
@@ -1088,11 +687,31 @@ function startQuiz(){
 
             timeLeft--;
 
-            document.getElementById("timer")
-                .innerText = timeLeft;
+
+            const timerElement =
+                getElement("timer");
+
+
+            if(timerElement){
+
+                timerElement.innerText =
+                    timeLeft;
+
+            }
+
+
+            if(timeLeft <= 10){
+
+                if(timerElement)
+                    timerElement.style.fontWeight =
+                        "900";
+
+            }
 
 
             if(timeLeft <= 0){
+
+                clearInterval(timer);
 
                 finishQuiz();
 
@@ -1103,13 +722,25 @@ function startQuiz(){
 }
 
 
-/* =========================================================
+/* =====================================================
    NEXT QUESTION
-========================================================= */
+===================================================== */
 
 function nextQuestion(){
 
-    if(qNumber >= TOTAL_QUESTIONS){
+    if(lives <= 0){
+
+        finishQuiz();
+
+        return;
+
+    }
+
+
+    if(
+        qNumber >=
+        quizQuestions.length
+    ){
 
         finishQuiz();
 
@@ -1133,88 +764,129 @@ function nextQuestion(){
 
     answered = false;
 
+
     qNumber++;
 
 
-    document.getElementById("qNo")
-        .innerText =
-        "Question " +
-        qNumber +
-        "/" +
-        TOTAL_QUESTIONS;
+    const qNo =
+        getElement("qNo");
+
+    if(qNo){
+
+        qNo.innerText =
+            `Question ${qNumber}/${quizQuestions.length}`;
+
+    }
 
 
-    document.getElementById("question")
-        .innerText =
-        currentQuestion.question;
+    const question =
+        getElement("question");
+
+    if(question){
+
+        question.innerText =
+            currentQuestion.question;
+
+    }
 
 
-    document.getElementById("result")
-        .innerText = "";
+    const result =
+        getElement("result");
+
+    if(result)
+        result.innerText = "";
 
 
-    document.getElementById("explanation")
-        .innerText = "";
+    const explanation =
+        getElement("explanation");
+
+    if(explanation)
+        explanation.innerText = "";
 
 
-    document.getElementById("options")
-        .innerHTML = "";
+    const options =
+        getElement("options");
+
+    if(options)
+        options.innerHTML = "";
 
 
-    document.getElementById("answer")
-        .style.display = "none";
+    const answer =
+        getElement("answer");
+
+    const longAnswer =
+        getElement("longAnswer");
 
 
-    document.getElementById("longAnswer")
-        .style.display = "none";
+    if(answer){
+
+        answer.value = "";
+        answer.style.display = "none";
+
+    }
 
 
-    document.getElementById("answer")
-        .value = "";
+    if(longAnswer){
+
+        longAnswer.value = "";
+        longAnswer.style.display = "none";
+
+    }
 
 
-    document.getElementById("longAnswer")
-        .value = "";
+    const check =
+        getElement("check");
+
+    const next =
+        getElement("next");
 
 
-    document.getElementById("check")
-        .disabled = false;
+    if(check)
+        check.disabled = false;
 
 
-    document.getElementById("next")
-        .disabled = true;
+    if(next)
+        next.disabled = true;
 
 
-    if(currentQuestion.type === "mcq"){
+    if(
+        currentQuestion.type === "mcq"
+    ){
 
         showMCQ();
 
     }
-
     else if(
         currentQuestion.type === "veryshort"
     ){
 
-        document.getElementById("answer")
-            .style.display = "block";
+        if(answer)
+            answer.style.display = "block";
 
     }
-
     else{
 
-        document.getElementById("longAnswer")
-            .style.display = "block";
+        if(longAnswer)
+            longAnswer.style.display =
+                "block";
 
     }
 
 
-    document.getElementById("progress")
-        .style.width =
-        (
-            qNumber /
-            TOTAL_QUESTIONS *
-            100
-        ) + "%";
+    const progress =
+        getElement("progress");
+
+
+    if(progress){
+
+        progress.style.width =
+            (
+                qNumber /
+                quizQuestions.length *
+                100
+            ) + "%";
+
+    }
 
 
     updateFeatureDisplay();
@@ -1222,9 +894,9 @@ function nextQuestion(){
 }
 
 
-/* =========================================================
-   MCQ
-========================================================= */
+/* =====================================================
+   SHOW MCQ
+===================================================== */
 
 function showMCQ(){
 
@@ -1232,26 +904,31 @@ function showMCQ(){
         currentQuestion.options || [];
 
 
-    options.forEach(option => {
+    const container =
+        getElement("options");
+
+
+    if(!container)
+        return;
+
+
+    options.forEach(optionText => {
 
         const button =
             document.createElement("button");
 
 
-        button.className =
-            "option";
+        button.type = "button";
 
-
-        button.type =
-            "button";
-
+        button.className = "option";
 
         button.innerText =
-            option;
+            optionText;
 
 
-        button.onclick =
-            function(){
+        button.addEventListener(
+            "click",
+            () => {
 
                 if(answered)
                     return;
@@ -1259,11 +936,13 @@ function showMCQ(){
 
                 document
                     .querySelectorAll(".option")
-                    .forEach(btn =>
+                    .forEach(btn => {
+
                         btn.classList.remove(
                             "selected"
-                        )
-                    );
+                        );
+
+                    });
 
 
                 button.classList.add(
@@ -1271,24 +950,33 @@ function showMCQ(){
                 );
 
 
-                document.getElementById("answer")
-                    .value = option;
-
-            };
+                const answer =
+                    getElement("answer");
 
 
-        document
-            .getElementById("options")
-            .appendChild(button);
+                if(answer){
+
+                    answer.value =
+                        optionText;
+
+                }
+
+            }
+        );
+
+
+        container.appendChild(
+            button
+        );
 
     });
 
 }
 
 
-/* =========================================================
+/* =====================================================
    CHECK ANSWER
-========================================================= */
+===================================================== */
 
 function checkAnswer(){
 
@@ -1308,27 +996,33 @@ function checkAnswer(){
     ){
 
         userAnswer =
-            document.getElementById("answer")
-                .value
-                .trim();
+            getElement("answer")
+                ?.value
+                ?.trim() || "";
 
     }
-
     else{
 
         userAnswer =
-            document.getElementById("longAnswer")
-                .value
-                .trim();
+            getElement("longAnswer")
+                ?.value
+                ?.trim() || "";
 
     }
 
 
     if(userAnswer === ""){
 
-        document.getElementById("result")
-            .innerText =
-            "⚠️ पहले answer लिखें.";
+        const result =
+            getElement("result");
+
+
+        if(result){
+
+            result.innerText =
+                "⚠️ पहले answer दें।";
+
+        }
 
         return;
 
@@ -1339,84 +1033,50 @@ function checkAnswer(){
 
 
     const correctAnswer =
-        String(currentQuestion.answer)
-            .trim()
-            .toLowerCase();
+        normalizeAnswer(
+            currentQuestion.answer
+        );
 
 
     const givenAnswer =
-        userAnswer
-            .trim()
-            .toLowerCase();
+        normalizeAnswer(
+            userAnswer
+        );
 
 
     const isCorrect =
-        givenAnswer === correctAnswer;
+        givenAnswer ===
+        correctAnswer;
 
 
     if(isCorrect){
 
-        score++;
-
-        correct++;
-
-        streak++;
-
-
-        if(streak > bestStreak){
-
-            bestStreak =
-                streak;
-
-            localStorage.setItem(
-                "bestStreak",
-                bestStreak
-            );
-
-        }
-
-
-        document.getElementById("result")
-            .innerText =
-            "✅ Correct! Excellent!";
-
-
-        playSound("correct");
+        handleCorrect();
 
     }
-
     else{
 
-        wrong++;
-
-        streak = 0;
-
-        lives--;
-
-
-        document.getElementById("result")
-            .innerText =
-            "❌ Wrong! Correct Answer: " +
-            currentQuestion.answer;
-
-
-        playSound("wrong");
+        handleWrong();
 
     }
 
 
-    document.getElementById("explanation")
-        .innerText =
-        "💡 Explanation: " +
-        currentQuestion.explanation;
+    showExplanation();
 
 
-    document.getElementById("check")
-        .disabled = true;
+    const check =
+        getElement("check");
+
+    const next =
+        getElement("next");
 
 
-    document.getElementById("next")
-        .disabled = false;
+    if(check)
+        check.disabled = true;
+
+
+    if(next)
+        next.disabled = false;
 
 
     updateAccuracy();
@@ -1428,7 +1088,7 @@ function checkAnswer(){
 
         setTimeout(
             finishQuiz,
-            700
+            800
         );
 
     }
@@ -1436,20 +1096,179 @@ function checkAnswer(){
 }
 
 
-/* =========================================================
+/* =====================================================
+   NORMALIZE ANSWER
+===================================================== */
+
+function normalizeAnswer(answer){
+
+    return String(answer)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g,"");
+
+}
+
+
+/* =====================================================
+   CORRECT ANSWER
+===================================================== */
+
+function handleCorrect(){
+
+    correct++;
+
+    streak++;
+
+    combo++;
+
+
+    /*
+       Base score
+    */
+
+    let points = 10;
+
+
+    /*
+       Combo bonus
+    */
+
+    if(combo >= 3)
+        points += 5;
+
+
+    if(combo >= 5)
+        points += 10;
+
+
+    /*
+       Streak bonus
+    */
+
+    if(streak >= 3)
+        points += 5;
+
+
+    score += points;
+
+
+    /*
+       XP
+    */
+
+    addXP(points);
+
+
+    /*
+       Best streak
+    */
+
+    if(streak > bestStreak){
+
+        bestStreak =
+            streak;
+
+
+        localStorage.setItem(
+            "bestStreak",
+            bestStreak
+        );
+
+    }
+
+
+    const result =
+        getElement("result");
+
+
+    if(result){
+
+        result.innerText =
+            `✅ Correct! +${points} XP 🔥`;
+
+    }
+
+
+    playSound("correct");
+
+}
+
+
+/* =====================================================
+   WRONG ANSWER
+===================================================== */
+
+function handleWrong(){
+
+    wrong++;
+
+    lives--;
+
+    streak = 0;
+
+    combo = 0;
+
+
+    const result =
+        getElement("result");
+
+
+    if(result){
+
+        result.innerText =
+            "❌ Wrong! Correct Answer: " +
+            currentQuestion.answer;
+
+    }
+
+
+    playSound("wrong");
+
+}
+
+
+/* =====================================================
+   EXPLANATION
+===================================================== */
+
+function showExplanation(){
+
+    const explanation =
+        getElement("explanation");
+
+
+    if(explanation){
+
+        explanation.innerText =
+            "💡 Explanation: " +
+            (
+                currentQuestion.explanation ||
+                "No explanation available."
+            );
+
+    }
+
+}
+
+
+/* =====================================================
    HINT
-========================================================= */
+===================================================== */
 
 function useHint(){
 
-    if(answered)
+    if(
+        answered ||
+        !currentQuestion
+    )
         return;
 
 
     if(hintsLeft <= 0){
 
         alert(
-            "आपके सभी hints खत्म हो गए हैं।"
+            "💡 आपके सभी hints खत्म हो गए हैं।"
         );
 
         return;
@@ -1460,10 +1279,20 @@ function useHint(){
     hintsLeft--;
 
 
-    alert(
-        "💡 Hint: " +
-        currentQuestion.hint
-    );
+    const result =
+        getElement("result");
+
+
+    if(result){
+
+        result.innerText =
+            "💡 Hint: " +
+            currentQuestion.hint;
+
+    }
+
+
+    addXP(2);
 
 
     updateFeatureDisplay();
@@ -1471,14 +1300,20 @@ function useHint(){
 }
 
 
-/* =========================================================
+/* =====================================================
    SKIP
-========================================================= */
+===================================================== */
 
 function skipQuestion(){
 
-    if(answered)
+    if(
+        answered ||
+        !currentQuestion
+    )
         return;
+
+
+    answered = true;
 
 
     skipped++;
@@ -1487,26 +1322,47 @@ function skipQuestion(){
 
     streak = 0;
 
-    answered = true;
+    combo = 0;
 
 
-    document.getElementById("result")
-        .innerText =
-        "⏭️ Question skipped.";
+    const result =
+        getElement("result");
 
 
-    document.getElementById("explanation")
-        .innerText =
-        "Correct Answer: " +
-        currentQuestion.answer;
+    if(result){
+
+        result.innerText =
+            "⏭️ Question skipped";
+
+    }
 
 
-    document.getElementById("check")
-        .disabled = true;
+    const explanation =
+        getElement("explanation");
 
 
-    document.getElementById("next")
-        .disabled = false;
+    if(explanation){
+
+        explanation.innerText =
+            "Correct Answer: " +
+            currentQuestion.answer;
+
+    }
+
+
+    const check =
+        getElement("check");
+
+    const next =
+        getElement("next");
+
+
+    if(check)
+        check.disabled = true;
+
+
+    if(next)
+        next.disabled = false;
 
 
     updateAccuracy();
@@ -1516,9 +1372,9 @@ function skipQuestion(){
 }
 
 
-/* =========================================================
+/* =====================================================
    ACCURACY
-========================================================= */
+===================================================== */
 
 function updateAccuracy(){
 
@@ -1530,36 +1386,31 @@ function updateAccuracy(){
         attempted === 0
             ? 0
             : Math.round(
-                (correct / attempted) * 100
+                correct /
+                attempted *
+                100
             );
 
 
     const element =
-        document.getElementById(
-            "accuracy"
-        );
+        getElement("accuracy");
 
 
-    if(element){
-
+    if(element)
         element.innerText =
             accuracy + "%";
-
-    }
 
 }
 
 
-/* =========================================================
-   FEATURE DISPLAY
-========================================================= */
+/* =====================================================
+   FEATURE PANEL
+===================================================== */
 
 function updateFeatureDisplay(){
 
     let panel =
-        document.getElementById(
-            "featurePanel"
-        );
+        getElement("featurePanel");
 
 
     if(!panel){
@@ -1570,23 +1421,9 @@ function updateFeatureDisplay(){
         panel.id =
             "featurePanel";
 
-        panel.style.padding =
-            "10px";
-
-        panel.style.margin =
-            "10px 0";
-
-        panel.style.borderRadius =
-            "12px";
-
-        panel.style.background =
-            "#f1f5f9";
-
 
         const quiz =
-            document.getElementById(
-                "quiz"
-            );
+            getElement("quiz");
 
 
         if(quiz)
@@ -1595,57 +1432,228 @@ function updateFeatureDisplay(){
     }
 
 
+    if(!panel)
+        return;
+
+
     panel.innerHTML = `
 
-        ❤️ Lives: <b>${lives}</b>
+        <div class="v8-features">
 
-        &nbsp;&nbsp;
+            <span>❤️ ${lives}</span>
 
-        🔥 Streak: <b>${streak}</b>
+            <span>🔥 ${streak}</span>
 
-        &nbsp;&nbsp;
+            <span>⚡ ${combo}</span>
 
-        🏆 Best Streak:
-        <b>${bestStreak}</b>
+            <span>💡 ${hintsLeft}</span>
 
-        &nbsp;&nbsp;
+            <span>⏭️ ${skipped}</span>
 
-        💡 Hints:
-        <b>${hintsLeft}</b>
+        </div>
 
-        &nbsp;&nbsp;
+        <div class="v8-actions">
 
-        ⏭️ Skipped:
-        <b>${skipped}</b>
+            <button
+                type="button"
+                onclick="useHint()">
+                💡 Hint
+            </button>
 
-        <br><br>
+            <button
+                type="button"
+                onclick="skipQuestion()">
+                ⏭️ Skip
+            </button>
 
-        <button
-            type="button"
-            onclick="useHint()">
-            💡 Hint
-        </button>
+            <button
+                type="button"
+                onclick="startDailyChallenge()">
+                🔥 Daily
+            </button>
 
-        <button
-            type="button"
-            onclick="skipQuestion()">
-            ⏭️ Skip
-        </button>
-
-        <button
-            type="button"
-            onclick="startDailyChallenge()">
-            🔥 Daily Challenge
-        </button>
+        </div>
 
     `;
 
 }
 
 
-/* =========================================================
+/* =====================================================
+   XP SYSTEM
+===================================================== */
+
+function addXP(amount){
+
+    playerXP += amount;
+
+
+    /*
+       हर 100 XP पर level up
+    */
+
+    const newLevel =
+        Math.floor(
+            playerXP / 100
+        ) + 1;
+
+
+    if(
+        newLevel >
+        playerLevel
+    ){
+
+        playerLevel =
+            newLevel;
+
+
+        showLevelUp();
+
+    }
+
+
+    localStorage.setItem(
+        "playerXP",
+        playerXP
+    );
+
+
+    localStorage.setItem(
+        "playerLevel",
+        playerLevel
+    );
+
+
+    updatePlayerLevel();
+
+}
+
+
+/* =====================================================
+   LEVEL UP
+===================================================== */
+
+function showLevelUp(){
+
+    playSound("success");
+
+
+    const result =
+        getElement("result");
+
+
+    if(result){
+
+        result.innerText =
+            `🎉 LEVEL UP! You are now Level ${playerLevel}!`;
+
+    }
+
+}
+
+
+/* =====================================================
+   PLAYER LEVEL DISPLAY
+===================================================== */
+
+function updatePlayerLevel(){
+
+    const elements =
+        document.querySelectorAll(
+            ".playerLevel"
+        );
+
+
+    elements.forEach(element => {
+
+        element.innerText =
+            "Level " +
+            playerLevel;
+
+    });
+
+
+    const xpElements =
+        document.querySelectorAll(
+            ".playerXP"
+        );
+
+
+    xpElements.forEach(element => {
+
+        element.innerText =
+            playerXP +
+            " XP";
+
+    });
+
+}
+
+
+/* =====================================================
+   ACHIEVEMENTS
+===================================================== */
+
+function checkAchievements(){
+
+    const achievements =
+        JSON.parse(
+            localStorage.getItem(
+                "achievements"
+            ) || "[]"
+        );
+
+
+    function unlock(name){
+
+        if(
+            !achievements.includes(name)
+        ){
+
+            achievements.push(name);
+
+            localStorage.setItem(
+                "achievements",
+                JSON.stringify(
+                    achievements
+                )
+            );
+
+        }
+
+    }
+
+
+    if(correct >= 10)
+        unlock("🎯 10 Correct");
+
+    if(streak >= 5)
+        unlock("🔥 5 Streak");
+
+    if(score >= 100)
+        unlock("🏆 100 Score");
+
+    if(
+        correct ===
+        quizQuestions.length &&
+        quizQuestions.length > 0
+    ){
+
+        unlock("💯 Perfect Quiz");
+
+    }
+
+
+    if(dailyMode)
+        unlock("🔥 Daily Challenger");
+
+
+}
+
+
+/* =====================================================
    DAILY CHALLENGE
-========================================================= */
+===================================================== */
 
 function startDailyChallenge(){
 
@@ -1653,21 +1661,16 @@ function startDailyChallenge(){
 
     dailyMode = true;
 
-    score = 0;
-    correct = 0;
-    wrong = 0;
-    qNumber = 0;
-
-    streak = 0;
-    lives = 3;
-    hintsLeft = 2;
-    skipped = 0;
+    resetQuizData();
 
 
     const today =
         new Date()
             .toISOString()
             .slice(0,10);
+
+
+    updateDailyStreak(today);
 
 
     let seed = 0;
@@ -1696,6 +1699,7 @@ function startDailyChallenge(){
                 1013904223
             ) >>> 0;
 
+
         return seed /
             4294967296;
 
@@ -1709,7 +1713,9 @@ function startDailyChallenge(){
     for(
         let i =
             quizQuestions.length - 1;
+
         i > 0;
+
         i--
     ){
 
@@ -1741,64 +1747,108 @@ function startDailyChallenge(){
     timeLeft = 60;
 
 
-    document.getElementById("quiz")
-        .style.display = "block";
-
-
-    document.getElementById("resultCard")
-        .style.display = "none";
-
-
-    document.getElementById("timer")
-        .innerText = timeLeft;
-
-
-    updateFeatureDisplay();
-
-    updateAccuracy();
+    showQuiz();
 
     nextQuestion();
 
-
-    timer =
-        setInterval(() => {
-
-            timeLeft--;
-
-
-            document.getElementById("timer")
-                .innerText =
-                timeLeft;
-
-
-            if(timeLeft <= 0){
-
-                finishQuiz();
-
-            }
-
-        },1000);
+    startTimer();
 
 }
 
 
-/* =========================================================
+/* =====================================================
+   DAILY STREAK
+===================================================== */
+
+function updateDailyStreak(today){
+
+    if(
+        lastDailyDate === today
+    )
+        return;
+
+
+    const previous =
+        new Date();
+
+
+    previous.setDate(
+        previous.getDate() - 1
+    );
+
+
+    const yesterday =
+        previous
+            .toISOString()
+            .slice(0,10);
+
+
+    if(
+        lastDailyDate === yesterday
+    ){
+
+        dailyStreak++;
+
+    }
+    else{
+
+        dailyStreak = 1;
+
+    }
+
+
+    lastDailyDate =
+        today;
+
+
+    localStorage.setItem(
+        "dailyStreak",
+        dailyStreak
+    );
+
+
+    localStorage.setItem(
+        "lastDailyDate",
+        today
+    );
+
+}
+
+
+/* =====================================================
    FINISH QUIZ
-========================================================= */
+===================================================== */
 
 function finishQuiz(){
 
     clearInterval(timer);
 
 
-    document.getElementById("quiz")
-        .style.display =
-        "none";
+    if(
+        !quizQuestions.length
+    )
+        return;
 
 
-    document.getElementById("resultCard")
-        .style.display =
-        "block";
+    checkAchievements();
+
+
+    const quiz =
+        getElement("quiz");
+
+
+    const resultCard =
+        getElement("resultCard");
+
+
+    if(quiz)
+        quiz.style.display =
+            "none";
+
+
+    if(resultCard)
+        resultCard.style.display =
+            "block";
 
 
     const attempted =
@@ -1809,42 +1859,96 @@ function finishQuiz(){
         attempted === 0
             ? 0
             : Math.round(
-                (correct / attempted) * 100
+                correct /
+                attempted *
+                100
             );
 
 
-    document.getElementById("finalScore")
-        .innerText =
-        score;
+    setText(
+        "finalScore",
+        score
+    );
 
 
-    document.getElementById("correct")
-        .innerText =
-        correct;
+    setText(
+        "correct",
+        correct
+    );
 
 
-    document.getElementById("wrong")
-        .innerText =
-        wrong;
+    setText(
+        "wrong",
+        wrong
+    );
 
 
-    document.getElementById("finalAccuracy")
-        .innerText =
-        accuracy + "%";
+    setText(
+        "finalAccuracy",
+        accuracy + "%"
+    );
+
+
+    /*
+       Perfect score
+    */
+
+    if(
+        correct ===
+        quizQuestions.length &&
+        quizQuestions.length > 0
+    ){
+
+        score += 50;
+
+        addXP(50);
+
+
+        const result =
+            getElement("result");
+
+
+        if(result){
+
+            result.innerText =
+                "🎉 PERFECT SCORE! +50 Bonus!";
+
+        }
+
+    }
 
 
     saveStats();
 
     saveQuizHistory();
 
+    updatePlayerLevel();
+
     playSound("success");
 
 }
 
 
-/* =========================================================
+/* =====================================================
+   SET TEXT
+===================================================== */
+
+function setText(id,value){
+
+    const element =
+        getElement(id);
+
+
+    if(element)
+        element.innerText =
+            value;
+
+}
+
+
+/* =====================================================
    SAVE STATS
-========================================================= */
+===================================================== */
 
 function saveStats(){
 
@@ -1866,27 +1970,19 @@ function saveStats(){
     }
 
 
-    const bestScore =
-        document.getElementById(
+    setText(
+        "bestScore",
+        localStorage.getItem(
             "bestScore"
-        );
-
-
-    if(bestScore){
-
-        bestScore.innerText =
-            localStorage.getItem(
-                "bestScore"
-            ) || 0;
-
-    }
+        ) || 0
+    );
 
 }
 
 
-/* =========================================================
-   QUIZ HISTORY
-========================================================= */
+/* =====================================================
+   HISTORY
+===================================================== */
 
 function saveQuizHistory(){
 
@@ -1898,25 +1994,44 @@ function saveQuizHistory(){
         );
 
 
+    const attempted =
+        correct + wrong;
+
+
+    const accuracy =
+        attempted === 0
+            ? 0
+            : Math.round(
+                correct /
+                attempted *
+                100
+            );
+
+
     history.unshift({
 
-        score: score,
+        score,
 
-        correct: correct,
+        correct,
 
-        wrong: wrong,
+        wrong,
 
-        accuracy:
-            correct + wrong === 0
-                ? 0
-                : Math.round(
-                    correct /
-                    (correct + wrong) *
-                    100
-                ),
+        skipped,
+
+        accuracy,
+
+        level:
+            playerLevel,
+
+        xp:
+            playerXP,
+
+        daily:
+            dailyMode,
 
         date:
-            new Date().toLocaleString()
+            new Date()
+                .toLocaleString()
 
     });
 
@@ -1931,9 +2046,9 @@ function saveQuizHistory(){
 }
 
 
-/* =========================================================
+/* =====================================================
    DARK MODE
-========================================================= */
+===================================================== */
 
 function toggleDark(){
 
@@ -1941,12 +2056,43 @@ function toggleDark(){
         .classList
         .toggle("dark");
 
+
+    localStorage.setItem(
+        "darkMode",
+        document.body
+            .classList
+            .contains("dark")
+    );
+
 }
 
 
-/* =========================================================
+/* =====================================================
+   LOAD DARK MODE
+===================================================== */
+
+function loadDarkMode(){
+
+    const enabled =
+        localStorage.getItem(
+            "darkMode"
+        ) === "true";
+
+
+    if(enabled){
+
+        document.body
+            .classList
+            .add("dark");
+
+    }
+
+}
+
+
+/* =====================================================
    SOUND
-========================================================= */
+===================================================== */
 
 function playSound(type){
 
@@ -1959,6 +2105,10 @@ function playSound(type){
         const AudioContext =
             window.AudioContext ||
             window.webkitAudioContext;
+
+
+        if(!AudioContext)
+            return;
 
 
         const audio =
@@ -1986,14 +2136,12 @@ function playSound(type){
                 700;
 
         }
-
         else if(type === "wrong"){
 
             oscillator.frequency.value =
                 200;
 
         }
-
         else{
 
             oscillator.frequency.value =
@@ -2003,18 +2151,17 @@ function playSound(type){
 
 
         gain.gain.value =
-            0.08;
+            0.06;
 
 
         oscillator.start();
 
 
         oscillator.stop(
-            audio.currentTime + 0.2
+            audio.currentTime + .18
         );
 
     }
-
     catch(error){
 
         console.log(
@@ -2026,9 +2173,9 @@ function playSound(type){
 }
 
 
-/* =========================================================
-   SOUND BUTTON
-========================================================= */
+/* =====================================================
+   SOUND TOGGLE
+===================================================== */
 
 function toggleSound(){
 
@@ -2037,9 +2184,7 @@ function toggleSound(){
 
 
     const button =
-        document.getElementById(
-            "soundBtn"
-        );
+        getElement("soundBtn");
 
 
     if(button){
@@ -2054,37 +2199,44 @@ function toggleSound(){
 }
 
 
-/* =========================================================
-   INITIAL LOAD
-========================================================= */
+/* =====================================================
+   RESET / PLAY AGAIN
+===================================================== */
+
+function playAgain(){
+
+    startQuiz();
+
+}
+
+
+/* =====================================================
+   INITIALIZATION
+===================================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
-    function(){
+    () => {
 
         loadChapters();
+
+        loadDarkMode();
+
+        updatePlayerLevel();
 
         updateFeatureDisplay();
 
 
-        const bestScore =
-            document.getElementById(
+        setText(
+            "bestScore",
+            localStorage.getItem(
                 "bestScore"
-            );
-
-
-        if(bestScore){
-
-            bestScore.innerText =
-                localStorage.getItem(
-                    "bestScore"
-                ) || 0;
-
-        }
+            ) || 0
+        );
 
 
         const classSelect =
-            document.getElementById(
+            getElement(
                 "classSelect"
             );
 
@@ -2100,3 +2252,101 @@ document.addEventListener(
 
     }
 );
+
+
+/* =====================================================
+   GLOBAL FUNCTIONS
+===================================================== */
+
+window.startQuiz =
+    startQuiz;
+
+window.nextQuestion =
+    nextQuestion;
+
+window.checkAnswer =
+    checkAnswer;
+
+window.useHint =
+    useHint;
+
+window.skipQuestion =
+    skipQuestion;
+
+window.startDailyChallenge =
+    startDailyChallenge;
+
+window.toggleDark =
+    toggleDark;
+
+window.toggleSound =
+    toggleSound;
+
+window.playAgain =
+    playAgain;
+⚠️ एक जरूरी बात
+ऊपर वाले code में मैंने कुछ sample questions रखे हैं। तुम्हारे पुराने V5 के बाकी questions इस code में वापस डालने होंगे। तुम्हारे पुराने questions array को इस code के const questions = [...] वाले हिस्से से replace कर सकते हो।
+और V8 के नए XP/Level + Feature Panel को तुम्हारी पिछली CSS से ज्यादा attractive दिखाने के लिए ये छोटा CSS भी अपनी style.css के सबसे नीचे जोड़ देना:
+/* ===============================
+   V8 FEATURE PANEL
+================================ */
+
+#featurePanel{
+    margin:15px 0;
+    padding:15px;
+
+    border-radius:18px;
+
+    background:rgba(99,102,241,.08);
+
+    border:1px solid rgba(99,102,241,.15);
+}
+
+.v8-features{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+}
+
+.v8-features span{
+    padding:8px 12px;
+    border-radius:12px;
+
+    background:var(--card);
+
+    font-size:14px;
+    font-weight:700;
+}
+
+.v8-actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
+.v8-actions button{
+    flex:1;
+    padding:10px;
+
+    border:0;
+    border-radius:11px;
+
+    background:var(--primary);
+    color:white;
+
+    font-weight:700;
+    cursor:pointer;
+}
+
+.v8-actions button:hover{
+    transform:translateY(-2px);
+}
+
+.playerLevel{
+    font-weight:800;
+}
+
+.playerXP{
+    font-weight:700;
+}
